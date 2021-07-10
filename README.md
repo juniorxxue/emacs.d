@@ -44,6 +44,6 @@ I've customized some shortcuts for my personal usage.
 
 | Shortcuts    | Functions                  |
 |--------------|----------------------------|
-| C-c C-Return | run code to this point |
+| C-c C-return | run code to this point |
 | M-p          | run previous command       |
 | M-n          | run next command           |
