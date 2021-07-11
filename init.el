@@ -11,7 +11,14 @@
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 
-(straight-use-package 'better-defaults)
+;; vertical minibuffer
+(straight-use-package 'selectrum)
+(require 'selectrum)
+(selectrum-mode +1)
+
+;; better-defaults
+(straight-use-package
+ '(better-defaults :type git :host github :repo "juniorxxue/better-defaults"))
 (defalias 'yes-or-no-p 'y-or-n-p)
 (require 'better-defaults)
 
@@ -29,18 +36,12 @@
 
 ;; theme
 (straight-use-package
- '(github-theme :type git :host github :repo "juniorxxue/GitHub-Theme-for-Emacs"))
+ '(github-theme :type git :host github :repo "juniorxxue/github-theme"))
 (load-theme 'github t)
 
 (straight-use-package 'mood-line)
 (require 'mood-line)
 (mood-line-mode)
-
-;; vertical minibuffer
-(straight-use-package 'ido-vertical-mode)
-(require 'ido-vertical-mode)
-(ido-vertical-mode 1)
-(setq ido-vertical-define-keys 'C-n-and-C-p-only)
 
 ;; proof-general
 (straight-use-package 'proof-general)
