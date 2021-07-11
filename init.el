@@ -32,6 +32,16 @@
  '(github-theme :type git :host github :repo "juniorxxue/GitHub-Theme-for-Emacs"))
 (load-theme 'github t)
 
+(straight-use-package 'mood-line)
+(require 'mood-line)
+(mood-line-mode)
+
+;; vertical minibuffer
+(straight-use-package 'ido-vertical-mode)
+(require 'ido-vertical-mode)
+(ido-vertical-mode 1)
+(setq ido-vertical-define-keys 'C-n-and-C-p-only)
+
 ;; proof-general
 (straight-use-package 'proof-general)
 (setq proof-splash-enable nil)

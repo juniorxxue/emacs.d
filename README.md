@@ -32,7 +32,7 @@ git clone https://github.com/juniorxxue/CoqIDE.git ~/.emacs.d
 
 ### Step 4
 
-Run your emacs and wait for a few seconds until the welcome page shows up
+Run your emacs and wait for a few minutes until the welcome page shows up
 
 ## Usage
 
