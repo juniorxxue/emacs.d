@@ -83,6 +83,11 @@
 
 ;; proof-general
 (straight-use-package 'proof-general)
+(defvar coq-user-tactics-db
+  '(
+    ("dependent induction" "dep ind" "dependent induction #" t "dependent\\s-+induction")
+    ("dependent destruction" "dep des" "dependent destruction #" t "dependent\\s-+destruction")
+    ))
 (setq proof-splash-enable nil)
 (setq proof-next-command-insert-space nil)
 
