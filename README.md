@@ -1,6 +1,9 @@
 # Coq IDE for macOS
 
-Throw away your CoqIDE/VSCoq, and use Proof General to maximize your productivity!
+Throw away your CoqIDE/VSCoq, and use tailored Proof General to maximize your productivity!
+
+![Screenshot](https://user-images.githubusercontent.com/31076337/125457209-3f5b9e1e-31b9-43eb-a1fc-6dadaa335530.png)
+
 
 ## Installation
 
