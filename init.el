@@ -57,19 +57,17 @@
   (exec-path-from-shell-initialize))
 
 ;; theme
-;;(straight-use-package
-;;'(github-theme :type git :host github :repo "juniorxxue/github-theme"))
-;;(load-theme 'github t)
-(set-frame-font "Source Code Pro 12")
+(set-frame-font "Source Code Pro 15")
 (setq-default cursor-type 'bar)
 
-(straight-use-package 'spacemacs-theme)
+(straight-use-package
+ '(spacemacs-theme :type git :host github :repo "juniorxxue/spacemacs-theme"))
 (require 'spacemacs-light-theme)
 (load-theme 'spacemacs-light t)
 (add-to-list 'default-frame-alist '(ns-transparent-titlebar .t))
 
 (straight-use-package
-  '(splash-screen :type git :host github :repo "rougier/emacs-splash"))
+ '(splash-screen :type git :host github :repo "juniorxxue/emacs-splash"))
 (require 'splash-screen)
 
 (straight-use-package 'mood-line)
