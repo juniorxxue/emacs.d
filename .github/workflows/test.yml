@@ -1,43 +1,30 @@
 name: CI
 
-on: [push, pull_request]
+on:
+  pull_request:
+  push:
+    paths-ignore:
+    - '**.md'
 
 jobs:
-  linux-test:
-    runs-on: ubuntu-latest
+  build:
+    runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
-        emacs-version:
-          - 26.1
-          - 26.2
-          - 26.3
+        os: [ubuntu-latest]
+        emacs_version:
           - 27.1
           - 27.2
           - snapshot
-
+        include:
+          - os: macos-latest
+            emacs_version: 27.2
     steps:
-      - uses: actions/checkout@v1
+    - uses: purcell/setup-emacs@master
+      with:
+        version: ${{ matrix.emacs_version }}
 
-      - uses: purcell/setup-emacs@master
-        with:
-          version: ${{ matrix.emacs-version }}
-
-      - name: Test
-        run: |
-          rm -rf ~/.emacs.d; \
-          mv -f ~/work/.emacs.d/.emacs.d ~; \
-          emacs --version; \
-          emacs -q --batch \
-          --eval "(message \"Testing...\")" \
-          --eval "(setq package-check-signature nil
-                        url-show-status nil)" \
-          --eval "(when (and (require 'org nil t) (string= (org-version) \"\"))
-                     (advice-add 'org-version :override (lambda (&rest _) \"9.3\")))" \
-          --eval "(let ((early-init-file (locate-user-emacs-file \"early-init.el\"))
-                        (user-init-file (locate-user-emacs-file \"init.el\")))
-                    (and (>= emacs-major-version 27) (load early-init-file))
-                    (load user-init-file)
-                    (run-hooks 'after-init-hook)
-                    (run-hooks 'emacs-startup-hook)
-                    (run-hooks 'window-setup-hook))" \
-          --eval "(message \"Testing...done\")"
+    - uses: actions/checkout@v2
+    - name: Check startup
+      run: ./test-startup.sh
