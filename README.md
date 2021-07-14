@@ -1,5 +1,8 @@
 # Coq IDE for macOS
 
+[![Build Status](https://github.com/juniorxxue/CoqIDE/workflows/CI/badge.svg?branch=main)](https://github.com/juniorxxue/CoqIDE/actions)
+[![License](http://img.shields.io/:license-gpl3-blue.svg)](LICENSE)
+
 Throw away your CoqIDE/VSCoq, and use tailored Proof General to maximize your productivity!
 
 ![Screenshot](https://user-images.githubusercontent.com/31076337/125457209-3f5b9e1e-31b9-43eb-a1fc-6dadaa335530.png)
