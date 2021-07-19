@@ -61,7 +61,7 @@
 (setq-default cursor-type 'bar)
 
 (straight-use-package
- '(spacemacs-theme :type git :host github :repo "juniorxxue/spacemacs-theme"))
+ '(spacemacs-theme :type git :host github :repo "juniorxxue/spacemacs-theme-coq"))
 (require 'spacemacs-light-theme)
 (load-theme 'spacemacs-light t)
 (add-to-list 'default-frame-alist '(ns-transparent-titlebar .t))
