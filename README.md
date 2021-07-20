@@ -5,7 +5,7 @@
 
 Throw away your CoqIDE/VSCoq, and use tailored Proof General to maximize your productivity!
 
-![Screenshot](https://user-images.githubusercontent.com/31076337/125457209-3f5b9e1e-31b9-43eb-a1fc-6dadaa335530.png)
+![Screenshot](https://github.com/juniorxxue/xcode-theme/blob/main/images/xcode-theme.png)
 
 
 ## Installation
