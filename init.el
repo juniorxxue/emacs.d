@@ -37,6 +37,9 @@
 (global-set-key (kbd "C-S-o") 'counsel-rhythmbox)
 (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history)
 
+(straight-use-package 'ivy-rich)
+(require 'ivy-rich)
+(ivy-rich-mode 1)
 
 ;; better-defaults
 (straight-use-package
@@ -57,13 +60,13 @@
   (exec-path-from-shell-initialize))
 
 ;; theme
-(set-frame-font "Source Code Pro 15")
+(set-frame-font "Fira Code 15")
 (setq-default cursor-type 'bar)
 
 (straight-use-package
- '(spacemacs-theme :type git :host github :repo "juniorxxue/spacemacs-theme-coq"))
-(require 'spacemacs-light-theme)
-(load-theme 'spacemacs-light t)
+ '(xcode-theme :type git :host github :repo "juniorxxue/xcode-theme"))
+(require 'xcode-light-theme)
+(load-theme 'xcode-light t)
 (add-to-list 'default-frame-alist '(ns-transparent-titlebar .t))
 
 (straight-use-package
