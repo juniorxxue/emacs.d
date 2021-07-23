@@ -84,6 +84,10 @@
 (global-set-key (kbd "M-j") #'good-scroll-up)
 (global-set-key (kbd "M-k") #'good-scroll-down)
 
+;; find-file-in-project
+(straight-use-package 'find-file-in-project)
+(require 'find-file-in-project)
+
 ;; proof-general
 (straight-use-package 'proof-general)
 (defvar coq-user-tactics-db
