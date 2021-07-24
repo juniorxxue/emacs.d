@@ -3,7 +3,7 @@
 [![Build Status](https://github.com/juniorxxue/CoqIDE/workflows/CI/badge.svg?branch=main)](https://github.com/juniorxxue/CoqIDE/actions)
 [![License](http://img.shields.io/:license-gpl3-blue.svg)](LICENSE)
 
-Throw away your CoqIDE/VSCoq, and use tailored Proof General to maximize your productivity!
+A decent configuration of Proof General.
 
 ![Screenshot](https://github.com/juniorxxue/xcode-theme/blob/main/images/xcode-theme.png)
 
