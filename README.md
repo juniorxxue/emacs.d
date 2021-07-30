@@ -5,7 +5,7 @@
 
 A decent configuration of Proof General.
 
-![Screenshot](https://github.com/juniorxxue/xcode-theme/blob/main/images/xcode-theme.png)
+![Screenshot](https://github.com/juniorxxue/xcode-theme/blob/main/images/xcode-dark-theme.png)
 
 
 ## Installation
