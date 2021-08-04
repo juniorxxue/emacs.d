@@ -12,7 +12,7 @@ A decent configuration of Proof General.
 
 ### Step 1
 
-Download the latest Emacs from [Emacs for macOS](https://emacsformacosx.com)
+Download the latest Emacs from [Emacs for macOS](https://emacsformacosx.com) and make sure your emacs version is 27.x
 
 ### Step 2
 
