@@ -59,6 +59,8 @@ In Emacs's universe, `C-x` stands for holding `Control` and then press `X`, `M-x
 | C-k       | delete line of current content to cursor                     |
 | C-p       | move cursor to previous line                                 |
 | C-n       | move cursor to next line                                     |
+| M-j       | scroll screen  down                                          |
+| M-k       | scroll screen up                                             |
 | C-f       | forward cursor one char                                      |
 | C-b       | backward cursor one char                                     |
 | C-s       | search                                                       |
