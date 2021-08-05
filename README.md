@@ -3,7 +3,7 @@
 [![Build Status](https://github.com/juniorxxue/CoqIDE/workflows/CI/badge.svg?branch=main)](https://github.com/juniorxxue/CoqIDE/actions)
 [![License](http://img.shields.io/:license-gpl3-blue.svg)](LICENSE)
 
-A decent configuration of Proof General. (Out-of-the-box for macOS, probably okay for Linux, and more-hacks-needed for Windows)
+An out-of-the-box Emacs configuration of Proof General.
 
 ![Screenshot](https://github.com/juniorxxue/xcode-theme/blob/main/images/xcode-dark-theme.png)
 
