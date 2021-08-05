@@ -87,6 +87,7 @@
 ;; find-file-in-project
 (straight-use-package 'find-file-in-project)
 (require 'find-file-in-project)
+(global-set-key (kbd "C-x p") #'find-file-in-project)
 
 ;; proof-general
 (straight-use-package 'proof-general)
@@ -98,7 +99,15 @@
 (setq proof-splash-enable nil)
 (setq proof-next-command-insert-space nil)
 
+;; force layout
+;; see @https://proofgeneral.github.io/doc/master/userman/Customizing-Proof-General/
+(setq proof-three-window-mode-policy 'hybrid)
+
 (straight-use-package 'company)
+;; let completion be global
+(add-hook 'after-init-hook 'global-company-mode)
+
+;; completion option for Require Import
 (setq company-coq-live-on-the-edge t)
 
 (straight-use-package 'company-coq)
@@ -107,6 +116,7 @@
                            (setq coq-compile-before-require 't)
                            ))
 
+;; handy keybindings
 (eval-after-load "proof-script"
   '(progn
      (define-key proof-mode-map (kbd "M-n")
