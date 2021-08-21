@@ -107,6 +107,11 @@
 ;; let completion be global
 (add-hook 'after-init-hook 'global-company-mode)
 
+;; sort company
+(straight-use-package 'company-statistics)
+(require 'company-statistics)
+(add-hook 'after-init-hook 'company-statistics-mode)
+
 ;; completion option for Require Import
 (setq company-coq-live-on-the-edge t)
 
