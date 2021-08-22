@@ -7,6 +7,13 @@ An out-of-the-box Emacs configuration of Proof General.
 
 ![Screenshot](https://github.com/juniorxxue/xcode-theme/blob/main/images/xcode-dark-theme.png)
 
+## Why don't I just use vanilla Emacs/Spacemacs/... with PG?
+
+* This repo is only aimed for Coq, so unrelated plugins would be excluded for better performance.
+* The configuration code is only 100+ lines and easy to customize without ELisp experience.
+* Keybindings is highly tuned for Proof General.
+* Syntax Highlighting is carefully tailored given the fact that 99% themes for PG are broken.
+
 
 ## Installation
 
@@ -44,7 +51,7 @@ Download and install the recommended font [Fira Code](https://fonts.google.com/s
 
 Run your emacs and wait for a few minutes until the welcome page shows up
 
-## Usage
+## Cheatsheet
 
 In Emacs's universe, `C-x` stands for holding `Control` and then press `X`, `M-x` stands for holding Meta key `Cmd` and then press `X`.
 
