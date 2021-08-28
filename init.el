@@ -37,9 +37,14 @@
 (global-set-key (kbd "C-S-o") 'counsel-rhythmbox)
 (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history)
 
+;; let ivy-mode be more informative
 (straight-use-package 'ivy-rich)
 (require 'ivy-rich)
 (ivy-rich-mode 1)
+
+;; sort minibuffer by history
+(straight-use-package 'smex)
+(require 'smex)
 
 ;; better-defaults
 (straight-use-package
