@@ -82,12 +82,12 @@
 (require 'mood-line)
 (mood-line-mode)
 
-;; scroll
-(straight-use-package 'good-scroll)
-(require 'good-scroll)
-(good-scroll-mode 1)
-(global-set-key (kbd "M-j") #'good-scroll-up)
-(global-set-key (kbd "M-k") #'good-scroll-down)
+;; scroll (commented for bugs in ubuntu)
+;; (straight-use-package 'good-scroll)
+;; (require 'good-scroll)
+;; (good-scroll-mode 1)
+;; (global-set-key (kbd "M-j") #'good-scroll-up)
+;; (global-set-key (kbd "M-k") #'good-scroll-down)
 
 ;; find-file-in-project
 (straight-use-package 'find-file-in-project)
