@@ -65,7 +65,7 @@
   (exec-path-from-shell-initialize))
 
 ;; theme
-(set-frame-font "Fira Code 15")
+(set-frame-font "Courier New 14")
 (setq-default cursor-type 'bar)
 
 (straight-use-package
@@ -133,6 +133,8 @@
          'proof-assert-next-command-interactive)
      (define-key proof-mode-map (kbd "<C-return>")
        'proof-goto-point)
+     (define-key proof-mode-map (kbd "M-h")
+       'coq-Check)
      (define-key proof-mode-map (kbd "M-p")
        'proof-undo-last-successful-command)))
 
@@ -141,3 +143,8 @@
                            (advice-add 'proof-assert-next-command-interactive
                                        :after (lambda (&optional ARG PRED)
                                                 (skip-chars-backward " \t\n")))))
+
+;; undo
+(straight-use-package 'undo-tree)
+(require 'undo-tree)
+(global-undo-tree-mode)

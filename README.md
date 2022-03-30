@@ -73,6 +73,7 @@ In Emacs's universe, `C-x` stands for holding `Control` and then press `X`, `M-x
 | C-s       | search                                                       |
 | C-x C-f   | open file                                                    |
 | C-x p     | open file in current project (don't use it in home directory) |
+| C-x u     | undo                                                         |
 
 ### Selection Form (Completion, Minibuffer)
 
@@ -90,3 +91,4 @@ In Emacs's universe, `C-x` stands for holding `Control` and then press `X`, `M-x
 | C-c C-return | run code to this point |
 | M-p          | run previous command       |
 | M-n          | run next command           |
+| M-h | coq-Check |
