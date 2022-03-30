@@ -40,7 +40,7 @@ brew install coq
 clone this repo in your $HOME directory
 
 ```
-git clone https://github.com/juniorxxue/CoqIDE.git ~/.emacs.d
+git clone https://github.com/juniorxxue/coq-ide.git ~/.emacs.d
 ```
 
 ### Step 4

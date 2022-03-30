@@ -22,8 +22,8 @@ jobs:
       - name: Test
         run: |
           rm -rf ~/.emacs.d; \
-          mv -f ~/work/CoqIDE/CoqIDE ~/work/CoqIDE/.emacs.d; \
-          mv -f ~/work/CoqIDE/.emacs.d ~; \
+          mv -f ~/work/coq-ide/coq-ide ~/work/coq-ide/.emacs.d; \
+          mv -f ~/work/coq-ide/.emacs.d ~; \
           emacs --version; \
           emacs -q --batch \
           --eval "(message \"Testing...\")" \
