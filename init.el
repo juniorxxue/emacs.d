@@ -72,7 +72,6 @@
  '(xcode-theme :type git :host github :repo "juniorxxue/xcode-theme"))
 (require 'xcode-light-theme)
 (load-theme 'xcode-light t)
-(add-to-list 'default-frame-alist '(ns-transparent-titlebar .t))
 
 (straight-use-package
  '(splash-screen :type git :host github :repo "juniorxxue/emacs-splash"))
