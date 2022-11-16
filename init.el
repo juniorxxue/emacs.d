@@ -1,149 +1,97 @@
-(defvar bootstrap-version)
-(let ((bootstrap-file
-       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-      (bootstrap-version 5))
-  (unless (file-exists-p bootstrap-file)
-    (with-current-buffer
-        (url-retrieve-synchronously
-         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
-         'silent 'inhibit-cookies)
-      (goto-char (point-max))
-      (eval-print-last-sexp)))
-  (load bootstrap-file nil 'nomessage))
+;;; init.el --- -*- lexical-binding: t -*-
 
-;; vertical minibuffer
-(straight-use-package 'ivy)
-(straight-use-package 'counsel)
-(ivy-mode)
-(setq ivy-use-virtual-buffers t)
-(setq enable-recursive-minibuffers t)
-;; enable this if you want `swiper' to use it
-;; (setq search-default-mode #'char-fold-to-regexp)
-(global-set-key (kbd "C-s") 'swiper)
-(global-set-key (kbd "C-c C-r") 'ivy-resume)
-(global-set-key (kbd "<f6>") 'ivy-resume)
-(global-set-key (kbd "M-x") 'counsel-M-x)
-(global-set-key (kbd "C-x C-f") 'counsel-find-file)
-(global-set-key (kbd "<f1> f") 'counsel-describe-function)
-(global-set-key (kbd "<f1> v") 'counsel-describe-variable)
-(global-set-key (kbd "<f1> o") 'counsel-describe-symbol)
-(global-set-key (kbd "<f1> l") 'counsel-find-library)
-(global-set-key (kbd "<f2> i") 'counsel-info-lookup-symbol)
-(global-set-key (kbd "<f2> u") 'counsel-unicode-char)
-(global-set-key (kbd "C-c g") 'counsel-git)
-(global-set-key (kbd "C-c j") 'counsel-git-grep)
-(global-set-key (kbd "C-c k") 'counsel-ag)
-(global-set-key (kbd "C-x l") 'counsel-locate)
-(global-set-key (kbd "C-S-o") 'counsel-rhythmbox)
-(define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history)
+(require 'package)
+(add-to-list 'package-archives
+             '("melpa" . "https://melpa.org/packages/") t)
 
-;; let ivy-mode be more informative
-(straight-use-package 'ivy-rich)
-(require 'ivy-rich)
-(ivy-rich-mode 1)
-
-;; sort minibuffer by history
-(straight-use-package 'smex)
-(require 'smex)
-
-;; better-defaults
-(straight-use-package
- '(better-defaults :type git :host github :repo "juniorxxue/better-defaults"))
-(defalias 'yes-or-no-p 'y-or-n-p)
-(require 'better-defaults)
-
-;;; I prefer cmd key for meta
 (setq mac-option-key-is-meta nil
       mac-command-key-is-meta t
       mac-command-modifier 'meta
       mac-option-modifier 'none)
 
-;; $PATH
-(straight-use-package 'exec-path-from-shell)
-(require 'exec-path-from-shell)
-(when (memq window-system '(mac ns x))
-  (exec-path-from-shell-initialize))
-
-;; theme
-(set-frame-font "Courier New 14")
+(set-frame-font "Fantasque Sans Mono 14")
 (setq-default cursor-type 'bar)
 
-(straight-use-package
- '(xcode-theme :type git :host github :repo "juniorxxue/xcode-theme"))
-(require 'xcode-light-theme)
-(load-theme 'xcode-light t)
+(add-to-list 'load-path "~/.emacs.d/site-lisp/use-package")
+(require 'use-package)
 
-(straight-use-package
- '(splash-screen :type git :host github :repo "juniorxxue/emacs-splash"))
-(require 'splash-screen)
+(with-eval-after-load 'info
+  (info-initialize)
+  (add-to-list 'Info-directory-list
+               "~/.emacs.d/site-lisp/use-package/"))
 
-(straight-use-package 'mood-line)
-(require 'mood-line)
-(mood-line-mode)
+(use-package diminish
+  :ensure t)
 
-;; scroll (commented for bugs in ubuntu)
-;; (straight-use-package 'good-scroll)
-;; (require 'good-scroll)
-;; (good-scroll-mode 1)
-;; (global-set-key (kbd "M-j") #'good-scroll-up)
-;; (global-set-key (kbd "M-k") #'good-scroll-down)
+(use-package smex
+  :ensure t)
 
-;; find-file-in-project
-(straight-use-package 'find-file-in-project)
-(require 'find-file-in-project)
-(global-set-key (kbd "C-x p") #'find-file-in-project)
+(use-package spacemacs-theme
+  :defer t)
 
-;; proof-general
-(straight-use-package 'proof-general)
-(defvar coq-user-tactics-db
-  '(
-    ("dependent induction" "dep ind" "dependent induction #" t "dependent\\s-+induction")
-    ("dependent destruction" "dep des" "dependent destruction #" t "dependent\\s-+destruction")
-    ))
-(setq proof-splash-enable nil)
-(setq proof-next-command-insert-space nil)
+(use-package splash-screen
+  :load-path "site-lisp/emacs-splash")
 
-;; force layout
-;; see @https://proofgeneral.github.io/doc/master/userman/Customizing-Proof-General/
-(setq proof-three-window-mode-policy 'hybrid)
+(use-package xcode-light-theme
+  :load-path "site-lisp/xcode-theme"
+  :config (load-theme 'xcode-light t))
 
-(straight-use-package 'company)
-;; let completion be global
-(add-hook 'after-init-hook 'global-company-mode)
+(use-package better-defaults
+  :ensure t
+  :config (setq visible-bell nil)
+          (defalias 'yes-or-no-p 'y-or-n-p))
 
-;; sort company
-(straight-use-package 'company-statistics)
-(require 'company-statistics)
-(add-hook 'after-init-hook 'company-statistics-mode)
+(use-package mood-line
+  :ensure t
+  :config (mood-line-mode))
 
-;; completion option for Require Import
-(setq company-coq-live-on-the-edge t)
+(use-package exec-path-from-shell
+  :if (memq window-system '(ns mac))
+  :ensure t
+  :config (exec-path-from-shell-initialize))
 
-(straight-use-package 'company-coq)
-(add-hook 'coq-mode-hook #'company-coq-mode)
-(add-hook 'coq-mode-hook (lambda ()
-                           (setq coq-compile-before-require 't)
-                           ))
+(use-package undo-tree
+  :ensure t
+  :config (global-undo-tree-mode))
 
-;; handy keybindings
-(eval-after-load "proof-script"
-  '(progn
-     (define-key proof-mode-map (kbd "M-n")
-         'proof-assert-next-command-interactive)
-     (define-key proof-mode-map (kbd "<C-return>")
-       'proof-goto-point)
-     (define-key proof-mode-map (kbd "M-h")
-       'coq-Check)
-     (define-key proof-mode-map (kbd "M-p")
-       'proof-undo-last-successful-command)))
+(use-package ido-vertical-mode
+  :ensure t
+  :config (ido-mode 1)
+(ido-vertical-mode 1)
+(setq ido-vertical-define-keys 'C-n-and-C-p-only))
 
-;; advise M-n
-(add-hook 'coq-mode-hook (lambda ()
-                           (advice-add 'proof-assert-next-command-interactive
-                                       :after (lambda (&optional ARG PRED)
-                                                (skip-chars-backward " \t\n")))))
+(use-package company
+  :ensure t
+  :config (add-hook 'after-init-hook 'global-company-mode))
 
-;; undo
-(straight-use-package 'undo-tree)
-(require 'undo-tree)
-(global-undo-tree-mode)
+(use-package company-statistics
+  :ensure t
+  :config (add-hook 'after-init-hook 'company-statistics-mode))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;; Coq Theorem Prover ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(use-package proof-general
+  :ensure t
+  :config 
+  (defvar coq-user-tactics-db
+  '(("dependent induction" "dep ind" "dependent induction #" t "dependent\\s-+induction")
+    ("dependent destruction" "dep des" "dependent destruction #" t "dependent\\s-+destruction")))
+  (setq proof-splash-enable nil)
+  (setq proof-next-command-insert-space nil)
+  (setq proof-three-window-mode-policy 'hybrid))
+
+(use-package proof-script
+  :config
+  (define-key proof-mode-map (kbd "M-n") 'proof-assert-next-command-interactive)
+  (define-key proof-mode-map (kbd "<C-return>") 'proof-goto-point)
+  (define-key proof-mode-map (kbd "M-h") 'coq-Check)
+  (define-key proof-mode-map (kbd "M-p") 'proof-undo-last-successful-command))
+
+(use-package company-coq
+  :ensure t
+  :init (setq company-coq-live-on-the-edge t)
+  :config (add-hook 'coq-mode-hook #'company-coq-mode)
+          (add-hook 'coq-mode-hook (lambda ()
+                           (setq coq-compile-before-require 't))))
