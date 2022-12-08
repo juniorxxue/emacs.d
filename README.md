@@ -1,55 +1,6 @@
-# Coq IDE for macOS
-
-[![Build Status](https://github.com/juniorxxue/CoqIDE/workflows/CI/badge.svg?branch=main)](https://github.com/juniorxxue/CoqIDE/actions)
-[![License](http://img.shields.io/:license-gpl3-blue.svg)](LICENSE)
-
-An out-of-the-box Emacs configuration of Proof General.
+# Coq & Agda Configs of Emacs
 
 ![Screenshot](https://github.com/juniorxxue/xcode-theme/blob/main/images/xcode-dark-theme.png)
-
-## Why don't I just use vanilla Emacs/Spacemacs/... with PG?
-
-* This repo is only aimed for Coq, so unrelated plugins would be excluded for better performance.
-* The configuration code is only 100+ lines and easy to customize without ELisp experience.
-* Keybindings is highly tuned for Proof General.
-* Syntax Highlighting is carefully tailored given the fact that 99% themes for PG are broken.
-
-
-## Installation
-
-### Step 1
-
-Download the latest Emacs from [Emacs for macOS](https://emacsformacosx.com) and make sure your emacs version is 27.x
-
-### Step 2
-
-Make sure `coqtop` is in your $PATH
-
-```
-which coqtop
-```
-
-otherwise, install it from homebrew
-
-```
-brew install coq
-```
-
-### Step 3
-
-clone this repo in your $HOME directory
-
-```
-git clone https://github.com/juniorxxue/coq-ide.git ~/.emacs.d
-```
-
-### Step 4
-
-Download and install the recommended font [Fira Code](https://fonts.google.com/specimen/Fira+Code) for the best
-
-### Step 5
-
-Run your emacs and wait for a few minutes until the welcome page shows up
 
 ## Cheatsheet
 
@@ -92,3 +43,9 @@ In Emacs's universe, `C-x` stands for holding `Control` and then press `X`, `M-x
 | M-p          | run previous command       |
 | M-n          | run next command           |
 | M-h | coq-Check |
+
+### Agda Mode
+
+| Shortcuts    | Functions                  |
+|--------------|----------------------------|
+| C-l | load file |
