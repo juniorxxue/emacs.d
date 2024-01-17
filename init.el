@@ -4,13 +4,20 @@
 (add-to-list 'package-archives
              '("melpa" . "https://melpa.org/packages/") t)
 
-(setq mac-option-key-is-meta nil
-      mac-command-key-is-meta t
-      mac-command-modifier 'meta
-      mac-option-modifier 'none)
+(setq mac-command-modifier 'meta)
 
-(set-frame-font "Jetbrains Mono 16")
+;; (set-frame-parameter nil 'ns-appearance 'dark)
+;; (set-frame-parameter nil 'ns-transparent-titlebar t)
+;; (set-frame-parameter nil 'alpha-background 80)
+;; (set-frame-parameter (selected-frame) 'alpha '(96 . 50))
+;; (add-to-list 'default-frame-alist '(alpha . (96 . 50)))
+
+(add-to-list 'default-frame-alist '(alpha-background . 80))
+
+(set-frame-font "mononoki 17" nil t)
+;; (set-face-attribute 'default nil :height 60)
 (setq-default cursor-type 'bar)
+(set-cursor-color "#7532a8") 
 
 (add-to-list 'load-path "~/.emacs.d/site-lisp/use-package")
 (require 'use-package)
@@ -29,13 +36,28 @@
 (use-package splash-screen
   :load-path "site-lisp/emacs-splash")
 
-(use-package xcode-light-theme
-  :load-path "site-lisp/xcode-theme"
-  :config (load-theme 'xcode-light t))
+;; (use-package xcode-light-theme
+;;   :load-path "site-lisp/xcode-theme"
+;;   :config (load-theme 'xcode-light t))
+
+(use-package doom-themes
+  :ensure t
+  :config
+  ;; Global settings (defaults)
+  (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
+        doom-themes-enable-italic t) ; if nil, italics is universally disabled
+;;  (load-theme 'doom-dracula t)
+  (load-theme 'doom-nord-light t)
+
+  ;; Enable flashing mode-line on errors
+  (doom-themes-visual-bell-config)
+  (set-cursor-color "#7532a8") 
+  )
 
 (use-package better-defaults
   :ensure t
   :config (setq visible-bell nil)
+          (show-paren-mode 0)
           (defalias 'yes-or-no-p 'y-or-n-p))
 
 (use-package mood-line
@@ -51,13 +73,6 @@
   :ensure t
   :config (global-undo-tree-mode))
 
-;; (use-package ido-vertical-mode
-;;   :ensure t
-;;   :config (ido-mode 1)
-;;           (ido-vertical-mode 1)
-;;           (setq ido-vertical-define-keys 'C-n-and-C-p-only))
-
-
 (use-package ivy
   :ensure t
   :init (ivy-mode 1) ; globally at startup
@@ -68,6 +83,8 @@
 
 (use-package counsel
   :ensure t
+  :config
+  (setq counsel-find-file-ignore-regexp "\\(?:\\.DS_Store\\|\\.agdai\\|\\.~undo-tree~\\|\\.\\#.*\\)\\'")
   :bind* ; load when pressed
   (("M-x"     . counsel-M-x)
    ("C-s"     . swiper)
@@ -76,30 +93,81 @@
    ("C-c g"   . counsel-git)      ; search for files in git repo
    ("C-c j"   . counsel-git-grep) ; search for regexp in git repo
    ("C-c /"   . counsel-ag)       ; Use ag for regexp
-   ("C-x l"   . counsel-locate)
-   ("<f1> f"  . counsel-describe-function)
-   ("<f1> v"  . counsel-describe-variable)
-   ("<f1> l"  . counsel-find-library)
-   ("<f2> i"  . counsel-info-lookup-symbol)
-   ("<f2> u"  . counsel-unicode-char)))     ; Resume last Ivy-based completion
+   ("C-x l"   . counsel-locate)))     ; Resume last Ivy-based completion
 
-(use-package company
-  :ensure t
-  :config (add-hook 'after-init-hook 'global-company-mode))
 
-(use-package company-statistics
+(defun treemacs-ignore-agdai (filename absolute-path)
+  (string-suffix-p "agdai" filename))
+
+
+(use-package treemacs
   :ensure t
-  :config (add-hook 'after-init-hook 'company-statistics-mode))
+  :config
+  (setq treemacs-no-png-images t)
+  (add-to-list 'treemacs-ignored-file-predicates #'treemacs-ignore-agdai)    
+  )
+
+;; (use-package company
+;;   :ensure t
+;;   :config
+;;   (setq company-minimum-prefix-length 1)
+;;   (add-hook 'after-init-hook 'global-company-mode))
+
+;; (use-package company-statistics
+;;   :ensure t
+;;   :config (add-hook 'after-init-hook 'company-statistics-mode))
+
+(use-package corfu
+  ;; Optional customizations
+  :custom
+  (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
+  ;; (corfu-auto t)                 ;; Enable auto completion
+  (corfu-separator ?\s)          ;; Orderless field separator
+  ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
+  ;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
+  ;; (corfu-preview-current nil)    ;; Disable current candidate preview
+  ;; (corfu-preselect 'prompt)      ;; Preselect the prompt
+  ;; (corfu-on-exact-match nil)     ;; Configure handling of exact matches
+  (corfu-scroll-margin 5)        ;; Use scroll margin
+
+  ;; Enable Corfu only for certain modes.
+  ;; :hook ((prog-mode . corfu-mode)
+  ;;        (shell-mode . corfu-mode)
+  ;;        (eshell-mode . corfu-mode))
+
+  ;; Recommended: Enable Corfu globally.  This is recommended since Dabbrev can
+  ;; be used globally (M-/).  See also the customization variable
+  ;; `global-corfu-modes' to exclude certain modes.
+  :ensure t
+  :init
+  (global-corfu-mode))
+
+;; Use Dabbrev with Corfu!
+(use-package dabbrev
+  ;; Swap M-/ and C-M-/
+  :bind (("M-/" . dabbrev-completion)
+         ("C-M-/" . dabbrev-expand))
+  :config
+  (add-to-list 'dabbrev-ignored-buffer-regexps "\\` "))
+
+;; A few more useful configurations...
+(use-package emacs
+  :init
+  ;; TAB cycle if there are only few candidates
+  (setq completion-cycle-threshold 3)
+
+  ;; Emacs 28: Hide commands in M-x which do not apply to the current mode.
+  ;; Corfu commands are hidden, since they are not supposed to be used via M-x.
+  ;; (setq read-extended-command-predicate
+  ;;       #'command-completion-default-include-p)
+
+  ;; Enable indentation+completion using the TAB key.
+  ;; `completion-at-point' is often bound to M-TAB.
+  (setq tab-always-indent 'complete))
 
 (use-package move-text
   :ensure t
   :config (move-text-default-bindings))
-
-(use-package projectile
-  :ensure t
-  :config
-  (projectile-mode +1)
-  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -128,7 +196,27 @@
   :init (setq company-coq-live-on-the-edge t)
   :config (add-hook 'coq-mode-hook #'company-coq-mode)
           (add-hook 'coq-mode-hook (lambda ()
-                                     (setq coq-compile-before-require 't))))
+                                     (setq coq-compile-before-require 't)))
+          (add-hook 'coq-mode-hook
+          (lambda ()
+            (setq-local prettify-symbols-alist
+                        '(("Alpha" . ?Α) ("Beta" . ?Β) ("Gamma" . ?Γ)
+                          ("Delta" . ?Δ) ("Epsilon" . ?Ε) ("Zeta" . ?Ζ)
+                          ("Eta" . ?Η) ("Theta" . ?Θ) ("Iota" . ?Ι)
+                          ("Kappa" . ?Κ) ("Lambda" . ?Λ) ("Mu" . ?Μ)
+                          ("Nu" . ?Ν) ("Xi" . ?Ξ) ("Omicron" . ?Ο)
+                          ("Pi" . ?Π) ("Rho" . ?Ρ) ("Sigma" . ?Σ)
+                          ("Tau" . ?Τ) ("Upsilon" . ?Υ) ("Phi" . ?Φ)
+                          ("Chi" . ?Χ) ("Psi" . ?Ψ) ("Omega" . ?Ω)
+                          ("alpha" . ?α) ("beta" . ?β) ("gamma" . ?γ)
+                          ("delta" . ?δ) ("epsilon" . ?ε) ("zeta" . ?ζ)
+                          ("eta" . ?η) ("theta" . ?θ) ("iota" . ?ι)
+                          ("kappa" . ?κ) ("lambda" . ?λ) ("mu" . ?μ)
+                          ("nu" . ?ν) ("xi" . ?ξ) ("omicron" . ?ο)
+                          ("pi" . ?π) ("rho" . ?ρ) ("sigma" . ?σ)
+                          ("tau" . ?τ) ("upsilon" . ?υ) ("phi" . ?φ)
+                          ("chi" . ?χ) ("psi" . ?ψ) ("omega" . ?ω))
+                        ))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;; Agda Theorem Prover ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -151,9 +239,9 @@
    (make-string (- 70 offset) ?\s)))
 
 (defun add-padding (str)
-  (concat "--"
-          (substring str 2 68)
-          "--"))
+  (concat "--+"
+          (substring str 3 67)
+          "+--"))
 
 (defun comment-block-generator ()
   "Generate comment block"
@@ -164,3 +252,27 @@
                   (add-padding (string-with-offset comment-message)) (string ?\n)
                   (add-padding (make-string 70 ?\s))                 (string ?\n)
                   (make-string 70 ?-)                                (string ?\n))))
+
+;; (use-package agda2-mode
+;;       :defer t
+;;       :init
+;;       (mapc
+;;        (lambda (x) (add-to-list 'face-remapping-alist x))
+;;        '((agda2-highlight-datatype-face              . font-lock-type-face)
+;;          (agda2-highlight-function-face              . font-lock-type-face)
+;;          (agda2-highlight-inductive-constructor-face . font-lock-function-name-face)
+;;          (agda2-highlight-keyword-face               . font-lock-keyword-face)
+;;          (agda2-highlight-module-face                . font-lock-constant-face)
+;;          (agda2-highlight-number-face                . nil)
+;;          (agda2-highlight-postulate-face             . font-lock-type-face)
+;;          (agda2-highlight-primitive-type-face        . font-lock-type-face)
+;;          (agda2-highlight-record-face                . font-lock-type-face))))
+
+
+(define-derived-mode eq-reason-mode text-mode "Equational Reasoning Mode"
+  "A custom major mode similar to text-mode with '= {...}' lines treated as comments."
+  (setq-local comment-start "= {")
+  (font-lock-add-keywords nil '(("^= \\(.*\\)$" 1 font-lock-comment-face)))
+)
+
+(provide 'eq-reason-mode)
