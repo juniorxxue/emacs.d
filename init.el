@@ -12,7 +12,7 @@
 ;; (set-frame-parameter (selected-frame) 'alpha '(96 . 50))
 ;; (add-to-list 'default-frame-alist '(alpha . (96 . 50)))
 
-(add-to-list 'default-frame-alist '(alpha-background . 80))
+;; (add-to-list 'default-frame-alist '(alpha-background . 80))
 
 (set-frame-font "mononoki 17" nil t)
 ;; (set-face-attribute 'default nil :height 60)
@@ -36,23 +36,17 @@
 (use-package splash-screen
   :load-path "site-lisp/emacs-splash")
 
-;; (use-package xcode-light-theme
-;;   :load-path "site-lisp/xcode-theme"
-;;   :config (load-theme 'xcode-light t))
-
-(use-package doom-themes
-  :ensure t
+(use-package xcode-light-theme
+  :load-path "site-lisp/xcode-theme"
   :config
-  ;; Global settings (defaults)
-  (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
-        doom-themes-enable-italic t) ; if nil, italics is universally disabled
-;;  (load-theme 'doom-dracula t)
-  (load-theme 'doom-nord-light t)
-
-  ;; Enable flashing mode-line on errors
-  (doom-themes-visual-bell-config)
-  (set-cursor-color "#7532a8") 
+  (load-theme 'xcode-light t)
+  (setq visible-bell t)
+  (setq ring-bell-function 'ignore)
   )
+
+(use-package reveal-in-osx-finder
+  :ensure t)
+  
 
 (use-package better-defaults
   :ensure t
@@ -73,32 +67,29 @@
   :ensure t
   :config (global-undo-tree-mode))
 
-(use-package ivy
+(use-package vertico
   :ensure t
-  :init (ivy-mode 1) ; globally at startup
-  :config
-  (setq ivy-use-virtual-buffers t)
-  (setq ivy-height 8)
-  (setq ivy-count-format "%d/%d "))
+  :init
+  (vertico-mode))
 
-(use-package counsel
+;; Optionally use the `orderless' completion style.
+(use-package orderless
   :ensure t
-  :config
-  (setq counsel-find-file-ignore-regexp "\\(?:\\.DS_Store\\|\\.agdai\\|\\.~undo-tree~\\|\\.\\#.*\\)\\'")
-  :bind* ; load when pressed
-  (("M-x"     . counsel-M-x)
-   ("C-s"     . swiper)
-   ("C-x C-f" . counsel-find-file)
-   ("C-x C-r" . counsel-recentf)  ; search for recently edited
-   ("C-c g"   . counsel-git)      ; search for files in git repo
-   ("C-c j"   . counsel-git-grep) ; search for regexp in git repo
-   ("C-c /"   . counsel-ag)       ; Use ag for regexp
-   ("C-x l"   . counsel-locate)))     ; Resume last Ivy-based completion
+  :init
+  ;; Configure a custom style dispatcher (see the Consult wiki)
+  ;; (setq orderless-style-dispatchers '(+orderless-consult-dispatch orderless-affix-dispatch)
+  ;;       orderless-component-separator #'orderless-escapable-split-on-space)
+  (setq completion-styles '(orderless basic)
+        completion-category-defaults nil
+        completion-category-overrides '((file (styles partial-completion)))))
 
+(use-package consult
+  :ensure t
+  :bind (("C-s" . consult-line)
+         ("C-x b" . consult-buffer)))
 
 (defun treemacs-ignore-agdai (filename absolute-path)
   (string-suffix-p "agdai" filename))
-
 
 (use-package treemacs
   :ensure t
@@ -106,16 +97,6 @@
   (setq treemacs-no-png-images t)
   (add-to-list 'treemacs-ignored-file-predicates #'treemacs-ignore-agdai)    
   )
-
-;; (use-package company
-;;   :ensure t
-;;   :config
-;;   (setq company-minimum-prefix-length 1)
-;;   (add-hook 'after-init-hook 'global-company-mode))
-
-;; (use-package company-statistics
-;;   :ensure t
-;;   :config (add-hook 'after-init-hook 'company-statistics-mode))
 
 (use-package corfu
   ;; Optional customizations
@@ -148,6 +129,7 @@
   :bind (("M-/" . dabbrev-completion)
          ("C-M-/" . dabbrev-expand))
   :config
+  (setq dabbrev-case-fold-search nil)
   (add-to-list 'dabbrev-ignored-buffer-regexps "\\` "))
 
 ;; A few more useful configurations...
@@ -276,3 +258,6 @@
 )
 
 (provide 'eq-reason-mode)
+
+(use-package tex
+  :ensure auctex)
