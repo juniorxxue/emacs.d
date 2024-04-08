@@ -14,7 +14,7 @@
 
 ;; (add-to-list 'default-frame-alist '(alpha-background . 80))
 
-(set-frame-font "mononoki 17" nil t)
+(set-frame-font "Iosevka Term 17" nil t)
 ;; (set-face-attribute 'default nil :height 60)
 (setq-default cursor-type 'bar)
 (set-cursor-color "#7532a8") 
@@ -30,9 +30,6 @@
 (use-package diminish
   :ensure t)
 
-(use-package smex
-  :ensure t)
-
 (use-package splash-screen
   :load-path "site-lisp/emacs-splash")
 
@@ -43,6 +40,7 @@
   (setq visible-bell t)
   (setq ring-bell-function 'ignore)
   )
+
 
 (use-package reveal-in-osx-finder
   :ensure t)
@@ -86,7 +84,10 @@
 (use-package consult
   :ensure t
   :bind (("C-s" . consult-line)
-         ("C-x b" . consult-buffer)))
+         ("C-x b" . consult-buffer))
+  :config (consult-customize
+           consult-line :inherit-input-method t)
+  )
 
 (defun treemacs-ignore-agdai (filename absolute-path)
   (string-suffix-p "agdai" filename))
@@ -150,6 +151,19 @@
 (use-package move-text
   :ensure t
   :config (move-text-default-bindings))
+
+(use-package hl-todo
+  :ensure t
+  :config (setq hl-todo-keyword-faces
+                '(("TODO"   . "#FF0000")
+                  ("FIXME"  . "#FF0000")
+                  ("DEBUG"  . "#A020F0")
+                  ("GOTCHA" . "#FF4500")
+                  ("STUB"   . "#1E90FF"))))
+
+(use-package consult-todo
+  :ensure t)
+  
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -230,9 +244,9 @@
   (interactive)
   (setq comment-message (read-string "Comment: "))
   (insert (concat (make-string 70 ?-)                                (string ?\n)
-                  (add-padding (make-string 70 ?\s))                 (string ?\n)
+;;                  (add-padding (make-string 70 ?\s))                 (string ?\n)
                   (add-padding (string-with-offset comment-message)) (string ?\n)
-                  (add-padding (make-string 70 ?\s))                 (string ?\n)
+;;                  (add-padding (make-string 70 ?\s))                 (string ?\n)
                   (make-string 70 ?-)                                (string ?\n))))
 
 ;; (use-package agda2-mode
