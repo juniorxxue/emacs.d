@@ -9,10 +9,9 @@
 ;; (set-frame-parameter nil 'ns-appearance 'dark)
 ;; (set-frame-parameter nil 'ns-transparent-titlebar t)
 ;; (set-frame-parameter nil 'alpha-background 80)
-;; (set-frame-parameter (selected-frame) 'alpha '(96 . 50))
-;; (add-to-list 'default-frame-alist '(alpha . (96 . 50)))
 
-;; (add-to-list 'default-frame-alist '(alpha-background . 80))
+;; (set-frame-parameter nil 'alpha-background 96)
+;; (add-to-list 'default-frame-alist '(alpha-background . 96))
 
 (set-frame-font "Iosevka Term 17" nil t)
 ;; (set-face-attribute 'default nil :height 60)
@@ -163,8 +162,6 @@
 
 (use-package consult-todo
   :ensure t)
-  
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;; Coq Theorem Prover ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -178,7 +175,9 @@
     ("dependent destruction" "dep des" "dependent destruction #" t "dependent\\s-+destruction")))
   (setq proof-splash-enable nil)
   (setq proof-next-command-insert-space nil)
-  (setq proof-three-window-mode-policy 'hybrid))
+  (setq proof-three-window-mode-policy 'hybrid)
+  (global-undo-tree-mode)
+  )
 
 (use-package proof-script
   :config
@@ -275,3 +274,38 @@
 
 (use-package tex
   :ensure auctex)
+
+(defmacro defadvice! (symbol arglist &rest body)
+  "Define an advice called SYMBOL and add it to PLACES.
+
+ARGLIST is as in `defun'. WHERE is a keyword as passed to `advice-add', and
+PLACE is the function to which to add the advice, like in `advice-add'.
+DOCSTRING and BODY are as in `defun'.
+
+\(fn SYMBOL ARGLIST &rest [WHERE PLACES...] BODY\)"
+  (declare (indent defun))
+  (let (where-alist)
+    (while (keywordp (car body))
+      (push `(cons ,(pop body) (ensure-list ,(pop body)))
+            where-alist))
+    `(progn
+       (defun ,symbol ,arglist ,@body)
+       (dolist (targets (list ,@(nreverse where-alist)))
+         (dolist (target (cdr targets))
+           (advice-add target (car targets) #',symbol))))))
+
+
+
+
+(use-package copilot
+  :ensure editorconfig
+  :ensure f
+  :load-path "site-lisp/copilot"
+  :config
+  (add-hook 'agda2-mode-hook 'copilot-mode)
+  (define-key copilot-completion-map (kbd "<tab>") 'copilot-accept-completion)
+  (define-key copilot-completion-map (kbd "TAB") 'copilot-accept-completion)
+  (defadvice! +copilot--get-source-a (fn &rest args)
+    :around #'copilot--get-source
+    (cl-letf (((symbol-function #'warn) #'message))
+      (apply fn args))))
