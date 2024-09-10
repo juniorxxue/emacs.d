@@ -6,15 +6,7 @@
 
 (setq mac-command-modifier 'meta)
 
-;; (set-frame-parameter nil 'ns-appearance 'dark)
-;; (set-frame-parameter nil 'ns-transparent-titlebar t)
-;; (set-frame-parameter nil 'alpha-background 80)
-
-;; (set-frame-parameter nil 'alpha-background 96)
-;; (add-to-list 'default-frame-alist '(alpha-background . 96))
-
 (set-frame-font "Iosevka Term 17" nil t)
-;; (set-face-attribute 'default nil :height 60)
 (setq-default cursor-type 'bar)
 (set-cursor-color "#7532a8") 
 
@@ -29,22 +21,16 @@
 (use-package diminish
   :ensure t)
 
-(use-package splash-screen
-  :load-path "site-lisp/emacs-splash")
-
 (use-package xcode-light-theme
   :load-path "site-lisp/xcode-theme"
   :config
   (load-theme 'xcode-light t)
   (setq visible-bell t)
-  (setq ring-bell-function 'ignore)
-  )
-
+  (setq ring-bell-function 'ignore))
 
 (use-package reveal-in-osx-finder
   :ensure t)
   
-
 (use-package better-defaults
   :ensure t
   :config (setq visible-bell nil)
@@ -69,13 +55,9 @@
   :init
   (vertico-mode))
 
-;; Optionally use the `orderless' completion style.
 (use-package orderless
   :ensure t
   :init
-  ;; Configure a custom style dispatcher (see the Consult wiki)
-  ;; (setq orderless-style-dispatchers '(+orderless-consult-dispatch orderless-affix-dispatch)
-  ;;       orderless-component-separator #'orderless-escapable-split-on-space)
   (setq completion-styles '(orderless basic)
         completion-category-defaults nil
         completion-category-overrides '((file (styles partial-completion)))))
@@ -85,8 +67,7 @@
   :bind (("C-s" . consult-line)
          ("C-x b" . consult-buffer))
   :config (consult-customize
-           consult-line :inherit-input-method t)
-  )
+           consult-line :inherit-input-method t))
 
 (defun treemacs-ignore-agdai (filename absolute-path)
   (string-suffix-p "agdai" filename))
@@ -134,7 +115,17 @@
 
 ;; A few more useful configurations...
 (use-package emacs
+  :bind
+  (("M-v" . yank)
+   ("M-c" . kill-ring-save)
+   ("M-s" . save-buffer)
+   ("M-=" . text-scale-increase)
+   ("M--" . text-scale-decrease)
+   ("M-z" . undo-tree-visualize)
+   )
+  
   :init
+  (setq inhibit-startup-screen t)
   ;; TAB cycle if there are only few candidates
   (setq completion-cycle-threshold 3)
 
@@ -145,23 +136,12 @@
 
   ;; Enable indentation+completion using the TAB key.
   ;; `completion-at-point' is often bound to M-TAB.
-  (setq tab-always-indent 'complete))
+  (setq tab-always-indent 'complete)
+  )
 
 (use-package move-text
   :ensure t
   :config (move-text-default-bindings))
-
-(use-package hl-todo
-  :ensure t
-  :config (setq hl-todo-keyword-faces
-                '(("TODO"   . "#FF0000")
-                  ("FIXME"  . "#FF0000")
-                  ("DEBUG"  . "#A020F0")
-                  ("GOTCHA" . "#FF4500")
-                  ("STUB"   . "#1E90FF"))))
-
-(use-package consult-todo
-  :ensure t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;; Coq Theorem Prover ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -222,9 +202,7 @@
 (load-file (let ((coding-system-for-read 'utf-8))
              (shell-command-to-string "agda-mode locate")))
 
-(use-package yasnippet
-  :ensure t
-  :config (yas-global-mode 1))
+;; (global-display-line-numbers-mode 1)
 
 (defun string-with-offset (msg)
   (setq offset (/ (- 70 (length msg)) 2))
@@ -294,18 +272,16 @@ DOCSTRING and BODY are as in `defun'.
          (dolist (target (cdr targets))
            (advice-add target (car targets) #',symbol))))))
 
-
-
-
 (use-package copilot
   :ensure editorconfig
   :ensure f
   :load-path "site-lisp/copilot"
-  :config
-  (add-hook 'agda2-mode-hook 'copilot-mode)
-  (define-key copilot-completion-map (kbd "<tab>") 'copilot-accept-completion)
-  (define-key copilot-completion-map (kbd "TAB") 'copilot-accept-completion)
+  :init
   (defadvice! +copilot--get-source-a (fn &rest args)
     :around #'copilot--get-source
     (cl-letf (((symbol-function #'warn) #'message))
-      (apply fn args))))
+      (apply fn args)))
+  :config
+  (add-hook 'agda2-mode-hook 'copilot-mode)
+  (define-key copilot-completion-map (kbd "<tab>") 'copilot-accept-completion)
+  (define-key copilot-completion-map (kbd "TAB") 'copilot-accept-completion))
