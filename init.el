@@ -18,15 +18,23 @@
   (add-to-list 'Info-directory-list
                "~/.emacs.d/site-lisp/use-package/"))
 
+(use-package fontify-face
+  :ensure t)
+
 (use-package diminish
   :ensure t)
 
-(use-package xcode-light-theme
-  :load-path "site-lisp/xcode-theme"
+(use-package nano-theme
+  :load-path "site-lisp/nano-theme"
   :config
-  (load-theme 'xcode-light t)
-  (setq visible-bell t)
-  (setq ring-bell-function 'ignore))
+  (load-theme 'nano t)
+  )
+
+
+;;(use-package nano-modeline
+;;  :load-path "site-lisp/nano-modeline"
+;;  :config
+;;  (nano-modeline nil t))
 
 (use-package reveal-in-osx-finder
   :ensure t)
@@ -34,6 +42,7 @@
 (use-package better-defaults
   :ensure t
   :config (setq visible-bell nil)
+          (setq ring-bell-function 'ignore)
           (show-paren-mode 0)
           (defalias 'yes-or-no-p 'y-or-n-p))
 
@@ -113,6 +122,16 @@
   (setq dabbrev-case-fold-search nil)
   (add-to-list 'dabbrev-ignored-buffer-regexps "\\` "))
 
+(use-package hl-line
+  :ensure t
+  :config (global-hl-line-mode 1))
+
+(use-package display-line-numbers
+  :ensure nil
+  :config
+;  (global-display-line-numbers-mode)
+  (add-hook 'agda2-mode-hook (lambda () (display-line-numbers-mode -))))
+
 ;; A few more useful configurations...
 (use-package emacs
   :bind
@@ -139,9 +158,34 @@
   (setq tab-always-indent 'complete)
   )
 
+(use-package ultra-scroll-mac
+  :if (eq window-system 'mac)
+  :load-path "site-lisp/ultra-scroll-mac" ; if you git clone'd instead of package-vc-install
+  :init
+  (setq scroll-conservatively 101 ; important!
+        scroll-margin 0) 
+  :config
+  (ultra-scroll-mac-mode 1))
+
 (use-package move-text
   :ensure t
   :config (move-text-default-bindings))
+
+(use-package projectile
+  :ensure t
+  :config
+  (projectile-mode +1)
+  (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
+  )
+
+
+(use-package dashboard
+  :ensure t
+  :config
+  (setq dashboard-items '((recents   . 10)
+                        (projects  . 5)))
+  (dashboard-setup-startup-hook)
+  )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;; Coq Theorem Prover ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -226,21 +270,6 @@
 ;;                  (add-padding (make-string 70 ?\s))                 (string ?\n)
                   (make-string 70 ?-)                                (string ?\n))))
 
-;; (use-package agda2-mode
-;;       :defer t
-;;       :init
-;;       (mapc
-;;        (lambda (x) (add-to-list 'face-remapping-alist x))
-;;        '((agda2-highlight-datatype-face              . font-lock-type-face)
-;;          (agda2-highlight-function-face              . font-lock-type-face)
-;;          (agda2-highlight-inductive-constructor-face . font-lock-function-name-face)
-;;          (agda2-highlight-keyword-face               . font-lock-keyword-face)
-;;          (agda2-highlight-module-face                . font-lock-constant-face)
-;;          (agda2-highlight-number-face                . nil)
-;;          (agda2-highlight-postulate-face             . font-lock-type-face)
-;;          (agda2-highlight-primitive-type-face        . font-lock-type-face)
-;;          (agda2-highlight-record-face                . font-lock-type-face))))
-
 
 (define-derived-mode eq-reason-mode text-mode "Equational Reasoning Mode"
   "A custom major mode similar to text-mode with '= {...}' lines treated as comments."
@@ -283,5 +312,6 @@ DOCSTRING and BODY are as in `defun'.
       (apply fn args)))
   :config
   (add-hook 'agda2-mode-hook 'copilot-mode)
+  (add-to-list 'copilot-indentation-alist '(agda2-mode . 2))
   (define-key copilot-completion-map (kbd "<tab>") 'copilot-accept-completion)
   (define-key copilot-completion-map (kbd "TAB") 'copilot-accept-completion))
