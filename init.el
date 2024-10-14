@@ -122,9 +122,9 @@
   (setq dabbrev-case-fold-search nil)
   (add-to-list 'dabbrev-ignored-buffer-regexps "\\` "))
 
-(use-package hl-line
-  :ensure t
-  :config (global-hl-line-mode 1))
+;;(use-package hl-line
+;;  :ensure t
+;;  :config (global-hl-line-mode 1))
 
 (use-package display-line-numbers
   :ensure nil

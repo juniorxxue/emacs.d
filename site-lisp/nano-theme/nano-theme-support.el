@@ -1015,7 +1015,10 @@ background color that is barely perceptible."
    '(agda2-highlight-datatype-face  ((t (:inherit nano-agda-datatype))))
    '(agda2-highlight-primitive-face ((t (:inherit nano-agda-datatype))))
    '(agda2-highlight-postulate-face ((t (:inherit nano-agda-module))))
-   '(agda2-highlight-missing-definition-face ((t (:inherit nano-popout-i))))
+   '(agda2-highlight-missing-definition-face ((t (:inherit nano-subtle))))
+   '(agda2-highlight-unsolved-meta-face ((t (:inherit nano-subtle))))
+   '(agda2-highlight-unsolved-constraint-face ((t (:inherit nano-subtle))))
+   '(agda2-highlight-error-face ((t (:inherit nano-critical))))
 
    ;; -- mood-line face
    '(mood-line-major-mode  ((t (:inherit nano-subtle-i))))

@@ -55,3 +55,15 @@ places
 recentf
 
 .DS_Store
+
+.cache/*
+*.swp
+company-statistics-cache.el
+ido.last
+custom.el
+opam-user-setup.el
+*.eld
+projects
+SessionDesktop.el
+smex-items
+transient/*
