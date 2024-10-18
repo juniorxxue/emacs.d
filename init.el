@@ -312,6 +312,6 @@ DOCSTRING and BODY are as in `defun'.
       (apply fn args)))
   :config
   (add-hook 'agda2-mode-hook 'copilot-mode)
-  (add-to-list 'copilot-indentation-alist '(agda2-mode . 2))
+  (add-to-list 'copilot-indentation-alist '(agda2-mode 2))
   (define-key copilot-completion-map (kbd "<tab>") 'copilot-accept-completion)
   (define-key copilot-completion-map (kbd "TAB") 'copilot-accept-completion))
