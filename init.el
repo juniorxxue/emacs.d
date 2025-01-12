@@ -4,11 +4,19 @@
 (add-to-list 'package-archives
              '("melpa" . "https://melpa.org/packages/") t)
 
+;; tweaking for speedup
+(setq gc-cons-threshold (* 1024 1024 1024))
+(setq gcmh-high-cons-threshold (* 1024 1024 1024))
+(setq gcmh-idle-delay-factor 20)
+(setq jit-lock-defer-time 0.05)
+(setq read-process-output-max (* 1024 1024))
+(setq package-native-compile t)
+
 (setq mac-command-modifier 'meta)
 
 (set-frame-font "Iosevka Term 17" nil t)
 (setq-default cursor-type 'bar)
-(set-cursor-color "#7532a8") 
+(set-cursor-color "#7532a8")
 
 (add-to-list 'load-path "~/.emacs.d/site-lisp/use-package")
 (require 'use-package)
@@ -30,15 +38,23 @@
   (load-theme 'nano t)
   )
 
-
 ;;(use-package nano-modeline
 ;;  :load-path "site-lisp/nano-modeline"
 ;;  :config
 ;;  (nano-modeline nil t))
 
+(use-package auto-save
+  :load-path "site-lisp/auto-save"
+  :config
+  (auto-save-enable)
+  (setq auto-save-silent t)   ; quietly save
+  (setq auto-save-delete-trailing-whitespace t)  ; automatically delete spaces at the end of the line when saving
+  )
+
+
 (use-package reveal-in-osx-finder
   :ensure t)
-  
+
 (use-package better-defaults
   :ensure t
   :config (setq visible-bell nil)
@@ -74,19 +90,10 @@
 (use-package consult
   :ensure t
   :bind (("C-s" . consult-line)
+         ("M-i" . consult-imenu)
          ("C-x b" . consult-buffer))
   :config (consult-customize
            consult-line :inherit-input-method t))
-
-(defun treemacs-ignore-agdai (filename absolute-path)
-  (string-suffix-p "agdai" filename))
-
-(use-package treemacs
-  :ensure t
-  :config
-  (setq treemacs-no-png-images t)
-  (add-to-list 'treemacs-ignored-file-predicates #'treemacs-ignore-agdai)    
-  )
 
 (use-package corfu
   ;; Optional customizations
@@ -94,11 +101,6 @@
   (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
   ;; (corfu-auto t)                 ;; Enable auto completion
   (corfu-separator ?\s)          ;; Orderless field separator
-  ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
-  ;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
-  ;; (corfu-preview-current nil)    ;; Disable current candidate preview
-  ;; (corfu-preselect 'prompt)      ;; Preselect the prompt
-  ;; (corfu-on-exact-match nil)     ;; Configure handling of exact matches
   (corfu-scroll-margin 5)        ;; Use scroll margin
 
   ;; Enable Corfu only for certain modes.
@@ -115,9 +117,7 @@
 
 ;; Use Dabbrev with Corfu!
 (use-package dabbrev
-  ;; Swap M-/ and C-M-/
-  :bind (("M-/" . dabbrev-completion)
-         ("C-M-/" . dabbrev-expand))
+  :bind (("M-/" . dabbrev-expand))
   :config
   (setq dabbrev-case-fold-search nil)
   (add-to-list 'dabbrev-ignored-buffer-regexps "\\` "))
@@ -127,10 +127,47 @@
 ;;  :config (global-hl-line-mode 1))
 
 (use-package display-line-numbers
-  :ensure nil
   :config
-;  (global-display-line-numbers-mode)
-  (add-hook 'agda2-mode-hook (lambda () (display-line-numbers-mode -))))
+  (setq display-line-numbers-grow-only t)
+  (add-hook 'agda2-mode-hook #'display-line-numbers-mode))
+
+(use-package paren
+  :config
+  (setq show-paren-when-point-inside-paren t
+        show-paren-when-point-in-periphery t
+        show-paren-context-when-offscreen t
+        show-paren-delay 0.2)
+  (add-hook 'agda2-mode-hook #'show-paren-mode))
+
+(defun agda-imenu-create-index ()
+  "Create an `imenu` index for Agda files, including Unicode names but excluding module declarations and duplicates."
+  (let (index seen-names)
+    (goto-char (point-min)) ; Start at the beginning of the buffer
+    (while (re-search-forward
+            "^\\([[:word:][:multibyte:]'_]+\\)\\s-*:" ; Match type signatures
+            nil t)
+      (let ((name (match-string 1))) ; Capture the name of the definition
+        (unless (member name seen-names) ; Avoid duplicates
+          (push name seen-names) ; Track seen names
+          (push (cons name (match-beginning 0)) index))))
+    (nreverse index))) ; Reverse the list to preserve the order
+
+(defun setup-agda-imenu ()
+  "Set up `imenu` for the current buffer in Agda mode."
+  ;; Ensure `imenu-create-index-function` is buffer-local
+  (setq-local imenu-create-index-function #'agda-imenu-create-index))
+
+(defun agda-imenu-refresh ()
+  "Refresh the `imenu` index for the current buffer."
+  ;; Ensure `imenu--index-alist` is cleared for a fresh rebuild
+  (setq-local imenu--index-alist nil))
+
+;; Hook to set up `imenu` for Agda mode
+(add-hook 'agda2-mode-hook
+          (lambda ()
+            (setup-agda-imenu) ;; Set up `imenu`
+            (agda-imenu-refresh))) ;; Refresh the index
+
 
 ;; A few more useful configurations...
 (use-package emacs
@@ -140,9 +177,8 @@
    ("M-s" . save-buffer)
    ("M-=" . text-scale-increase)
    ("M--" . text-scale-decrease)
-   ("M-z" . undo-tree-visualize)
-   )
-  
+   ("M-z" . undo-only))
+
   :init
   (setq inhibit-startup-screen t)
   ;; TAB cycle if there are only few candidates
@@ -163,7 +199,7 @@
   :load-path "site-lisp/ultra-scroll-mac" ; if you git clone'd instead of package-vc-install
   :init
   (setq scroll-conservatively 101 ; important!
-        scroll-margin 0) 
+        scroll-margin 0)
   :config
   (ultra-scroll-mac-mode 1))
 
@@ -171,11 +207,31 @@
   :ensure t
   :config (move-text-default-bindings))
 
+(use-package rg
+  :ensure t)
+
 (use-package projectile
   :ensure t
   :config
   (projectile-mode +1)
   (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
+  )
+
+(defun treemacs-ignore-specific-files (filename absolute-path)
+  "Ignore files ending with '.agdai', '.xmind', or named '.projectile'."
+  (or (string-suffix-p ".agdai" filename)
+      (string-suffix-p ".xmind" filename)
+      (string-equal ".projectile" filename)))
+
+(use-package treemacs
+  :ensure t
+  :config
+  ;; (setq treemacs-no-png-images t)
+  (setq treemacs-sorting 'mod-time-desc)
+  (set-face-background 'treemacs-window-background-face "#f5f6f7")
+  ;; Add the custom ignore predicate to Treemacs
+  (add-to-list 'treemacs-ignored-file-predicates #'treemacs-ignore-specific-files)
+  ;; (setq imenu-auto-rescan t)
   )
 
 
