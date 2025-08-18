@@ -14,7 +14,7 @@
 
 (setq mac-command-modifier 'meta)
 
-(set-frame-font "Iosevka Term 17" nil t)
+(set-frame-font "Iosevka Term 15" nil t)
 (setq-default cursor-type 'bar)
 (set-cursor-color "#7532a8")
 
@@ -26,17 +26,57 @@
   (add-to-list 'Info-directory-list
                "~/.emacs.d/site-lisp/use-package/"))
 
+(defvar my-comment-below-cursor-toggle nil
+  "Store whether the region below the cursor is commented or not.
+This variable does not persist across Emacs sessions.")
+
+(defun comment-uncomment-below-cursor ()
+  "Toggle comment/uncomment from the current position to the end of the buffer."
+  (interactive)
+  (if (not my-comment-below-cursor-toggle)
+      (progn
+        ;; If not commented yet, comment the region.
+        (comment-region (point) (point-max))
+        (setq my-comment-below-cursor-toggle t)
+        (message "Commented below cursor."))
+    (progn
+      ;; If already commented, uncomment the region.
+      (uncomment-region (point) (point-max))
+      (setq my-comment-below-cursor-toggle nil)
+      (message "Uncommented below cursor."))))
+
+;; Bind the toggle to F6
+(global-set-key (kbd "<f6>") 'comment-uncomment-below-cursor)
+
+
 (use-package fontify-face
   :ensure t)
 
 (use-package diminish
   :ensure t)
 
+;; Light theme package (nano)
 (use-package nano-theme
   :load-path "site-lisp/nano-theme"
-  :config
-  (load-theme 'nano t)
-  )
+  :defer t) ;; defer actual loading; we'll load via time-based switcher
+
+(use-package nimbus-theme
+  :load-path "site-lisp/nimbus-theme"
+  :defer t)
+
+;; --- Time-based theme switching (nano 08:00-19:59, nimbus 20:00-07:59) ---
+(defun my/apply-theme-based-on-time ()
+  "Apply nano (light) between 08:00-19:59 local time; otherwise nimbus (dark)."
+  (let* ((hour (string-to-number (format-time-string "%H")))
+         (lightp (and (>= hour 8) (< hour 20)))
+         (target (if lightp 'nano 'nimbus)))
+    (unless (member target custom-enabled-themes)
+      (mapc #'disable-theme custom-enabled-themes)
+      (ignore-errors (load-theme target t)))))
+
+;; Immediate apply at startup and then every 15 minutes (900s)
+(my/apply-theme-based-on-time)
+(run-with-timer 0 900 #'my/apply-theme-based-on-time)
 
 ;;(use-package nano-modeline
 ;;  :load-path "site-lisp/nano-modeline"
@@ -51,6 +91,21 @@
   (setq auto-save-delete-trailing-whitespace t)  ; automatically delete spaces at the end of the line when saving
   )
 
+(use-package smart-hungry-delete
+  :ensure t
+  :bind (([remap hungry-delete-backward] . smart-hungry-delete-backward-char)
+         ([remap hungry-delete-forward] . smart-hungry-delete-forward-char)
+         ("M-<delete>" . smart-hungry-delete-forward-char)
+         ("M-<backspace>" . smart-hungry-delete-backward-char))
+  :init (smart-hungry-delete-add-default-hooks))
+
+
+(use-package expand-region
+  :ensure t
+  :bind
+  (("M-]" . er/expand-region)
+   ("M-[" . er/contract-region))
+  )
 
 (use-package reveal-in-osx-finder
   :ensure t)
@@ -97,6 +152,7 @@
 
 (use-package corfu
   ;; Optional customizations
+
   :custom
   (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
   ;; (corfu-auto t)                 ;; Enable auto completion
@@ -113,11 +169,27 @@
   ;; `global-corfu-modes' to exclude certain modes.
   :ensure t
   :init
+  (corfu-history-mode 1)
   (global-corfu-mode))
+
+(use-package cape
+  ;; Bind prefix keymap providing all Cape commands under a mnemonic key.
+  :bind (("M-/" . cape-dabbrev))
+  :init
+  ;; Add to the global default value of `completion-at-point-functions' which is
+  ;; used by `completion-at-point'.  The order of the functions matters, the
+  ;; first function returning a result wins.  Note that the list of buffer-local
+  ;; completion functions takes precedence over the global list.
+  (add-hook 'completion-at-point-functions #'cape-dabbrev)
+  (add-hook 'completion-at-point-functions #'cape-file)
+  (add-hook 'completion-at-point-functions #'cape-elisp-block)
+  ;; (add-hook 'completion-at-point-functions #'cape-history)
+  ;; ...
+)
 
 ;; Use Dabbrev with Corfu!
 (use-package dabbrev
-  :bind (("M-/" . dabbrev-expand))
+;;  :bind (("M-/" . dabbrev-expand))
   :config
   (setq dabbrev-case-fold-search nil)
   (add-to-list 'dabbrev-ignored-buffer-regexps "\\` "))
@@ -192,6 +264,7 @@
   ;; Enable indentation+completion using the TAB key.
   ;; `completion-at-point' is often bound to M-TAB.
   (setq tab-always-indent 'complete)
+  (delete-selection-mode 1)
   )
 
 (use-package ultra-scroll-mac
@@ -212,6 +285,7 @@
 
 (use-package projectile
   :ensure t
+  :bind (("M-p" . projectile-find-file))
   :config
   (projectile-mode +1)
   (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
@@ -226,13 +300,51 @@
 (use-package treemacs
   :ensure t
   :config
-  ;; (setq treemacs-no-png-images t)
+  (setq treemacs-no-png-images t)
   (setq treemacs-sorting 'mod-time-desc)
-  (set-face-background 'treemacs-window-background-face "#f5f6f7")
+
   ;; Add the custom ignore predicate to Treemacs
   (add-to-list 'treemacs-ignored-file-predicates #'treemacs-ignore-specific-files)
   ;; (setq imenu-auto-rescan t)
   )
+
+;; 1. Define a variable to track the input method during projectile-replace
+(defvar-local projectile-replace--active-input-method nil
+  "Input method to activate during projectile-replace prompts.")
+
+;; 2. Advice to capture the input method when projectile-replace starts
+(advice-add 'projectile-replace :around
+  (lambda (orig-fun &rest args)
+    (let ((projectile-replace--active-input-method current-input-method))
+      (apply orig-fun args))))
+
+;; 3. Advice to activate the input method in EVERY read-string called by projectile-replace
+(advice-add 'read-string :around
+  (lambda (orig-fun &rest args)
+    (if projectile-replace--active-input-method
+        (minibuffer-with-setup-hook
+            (lambda ()
+              (activate-input-method projectile-replace--active-input-method))
+      (apply orig-fun args))))
+
+(with-eval-after-load 'treemacs
+        (defun treemacs--force-git-update-current-file ()
+          (-let [file (treemacs-canonical-path buffer-file-name)]
+            (treemacs-run-in-every-buffer
+             (when (treemacs-is-path file :in-workspace)
+               (treemacs-update-single-file-git-state file)))))
+  (add-hook 'after-save-hook 'treemacs--force-git-update-current-file))
+
+(defun now ()
+  "Insert string for the current time formatted like '2:34 PM'."
+  (interactive)                 ; permit invocation in minibuffer
+  (insert (format-time-string "%D %-I:%M %p")))
+
+(defun today ()
+  "Insert string for today's date nicely formatted in American style,
+e.g. Sunday, September 17, 2000."
+  (interactive)                 ; permit invocation in minibuffer
+  (insert (format-time-string "%A, %B %e, %Y")))
 
 
 (use-package dashboard
@@ -357,6 +469,20 @@ DOCSTRING and BODY are as in `defun'.
          (dolist (target (cdr targets))
            (advice-add target (car targets) #',symbol))))))
 
+(use-package agda2-mode
+  :ensure f
+  :bind (
+         ("M-l" . agda2-load)
+         ("M-j" . agda2-goal-and-context)
+         ("M-k" . agda2-goal-and-context-and-inferred)
+         ))
+
+(use-package diff-hl
+  :ensure f
+  :load-path "site-lisp/diff-hl"
+  :config
+  (global-diff-hl-mode))
+
 (use-package copilot
   :ensure editorconfig
   :ensure f
@@ -368,6 +494,73 @@ DOCSTRING and BODY are as in `defun'.
       (apply fn args)))
   :config
   (add-hook 'agda2-mode-hook 'copilot-mode)
+  (add-hook 'coq-mode-hook 'copilot-mode)
   (add-to-list 'copilot-indentation-alist '(agda2-mode 2))
   (define-key copilot-completion-map (kbd "<tab>") 'copilot-accept-completion)
   (define-key copilot-completion-map (kbd "TAB") 'copilot-accept-completion))
+
+(defun insert-dashed-line ()
+  "Insert a dashed line at the current cursor position."
+  (interactive)
+  (insert "----------------------------------------"))
+
+(global-set-key (kbd "C--") 'insert-dashed-line)
+
+(defconst agda2-admit-pragmas
+  '("{-# OPTIONS --allow-unsolved-metas #-}"
+    "{-# OPTIONS --allow-incomplete-matches #-}")
+  "The two pragmas to ensure at the top of an Agda file for admitting unsolved metas / incomplete matches.")
+
+(defun agda2--ensure-admit-options-in-buffer ()
+  "Ensure both admit OPTIONS pragmas appear in current buffer.
+If missing, insert them (first one at top; second after the first if needed).
+Returns t if the buffer was modified."
+  (save-excursion
+    (goto-char (point-min))
+    (let ((modified nil)
+          (first (car agda2-admit-pragmas))
+          (second (cadr agda2-admit-pragmas)))
+      ;; If first pragma is missing at top, insert both.
+      (unless (looking-at-p (regexp-quote first))
+        (insert (concat first "\n" second "\n"))
+        (setq modified t))
+      ;; If first is present but second is nowhere in the file, insert second after first line.
+      (when (and (looking-at-p (regexp-quote first))
+                 (not (save-excursion
+                        (goto-char (point-min))
+                        (search-forward second nil t))))
+        ;; Move to end of first line and insert second.
+        (goto-char (point-min))
+        (forward-line 1)
+        (insert (concat second "\n"))
+        (setq modified t))
+      modified)))
+
+(defun agda2-admit-file ()
+  "Insert the admit OPTIONS pragmas at the top of the current Agda file if not already present."
+  (interactive)
+  (when (buffer-file-name)  ;; only operate on real files
+    (save-excursion
+      (when (agda2--ensure-admit-options-in-buffer)
+      (save-buffer)))))
+
+(defun agda2-admit-directory (dir)
+  "Prompt for DIR (defaulting to current buffer's parent directory) and ensure admit OPTIONS
+pragmas are in all .agda files directly under it."
+  (interactive
+   (let* ((file (buffer-file-name))
+          (default (if file (file-name-directory file) default-directory))
+          (chosen (read-directory-name "Directory with .agda files: " default nil t)))
+     (list chosen)))
+  (let* ((files (directory-files dir t "\\.agda\\'"))
+         (modified-count 0))
+    (if (null files)
+        (message "No .agda files found in %s" dir)
+      (dolist (f files)
+        (let ((buf (find-file-noselect f)))
+          (with-current-buffer buf
+            (let ((inhibit-read-only t))
+              (when (agda2--ensure-admit-options-in-buffer)
+                (save-buffer)
+                (cl-incf modified-count))))))
+      (message "Scanned %d .agda files in %s; updated %d of them." (length files) dir modified-count))))

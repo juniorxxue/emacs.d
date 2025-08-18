@@ -271,7 +271,11 @@
   "Default background color"
   :type 'color :group 'nano-theme-light)
 
-(defcustom nano-light-highlight "#FAFAFA" ;; Very Light Grey
+(defcustom nano-light-highlight "#D9EAFD" ;; #FAFAFA" ;; Very Light Grey
+  "Highlight color is used to highlight part of the screen."
+  :type 'color :group 'nano-theme-light)
+
+(defcustom nano-light-strong-highlight "#D76C82" ;;
   "Highlight color is used to highlight part of the screen."
   :type 'color :group 'nano-theme-light)
 
@@ -720,6 +724,9 @@ background color that is barely perceptible."
    `(highlight ((,light (:background ,nano-light-highlight))
                 (,dark  (:background ,nano-dark-highlight))))
 
+   `(strong-highlight ((,light (:background ,nano-light-strong-highlight))
+                (,dark  (:background ,nano-light-strong-highlight))))
+
    `(nano-subtle ((,light (:background ,nano-light-subtle))
                   (,dark  (:background ,nano-dark-subtle))))
 
@@ -747,8 +754,8 @@ background color that is barely perceptible."
    `(nano-agda-module ((,light (:foreground ,nano-agda-module-light-foreground))
                        (,dark (:foreground ,nano-agda-number-dark-foreground))))
 
-   `(nano-agda-inductive-constructor ((,light (:foreground ,nano-agda-inductive-constructor-light-foreground))
-                                      (,dark (:foreground ,nano-agda-inductive-constructor-dark-foreground))))
+  `(nano-agda-inductive-constructor ((,light (:foreground ,nano-agda-inductive-constructor-light-foreground :slant italic))
+                          (,dark (:foreground ,nano-agda-inductive-constructor-dark-foreground :slant italic))))
 
    `(nano-agda-datatype ((,light (:foreground ,nano-agda-datatype-light-foreground))
                          (,dark (:foreground ,nano-agda-datatype-dark-foreground))))
@@ -1016,9 +1023,26 @@ background color that is barely perceptible."
    '(agda2-highlight-primitive-face ((t (:inherit nano-agda-datatype))))
    '(agda2-highlight-postulate-face ((t (:inherit nano-agda-module))))
    '(agda2-highlight-missing-definition-face ((t (:inherit nano-subtle))))
-   '(agda2-highlight-unsolved-meta-face ((t (:inherit highlight))))
+   '(agda2-highlight-unsolved-meta-face ((t (:inherit strong-highlight))))
    '(agda2-highlight-unsolved-constraint-face ((t (:inherit nano-subtle))))
    '(agda2-highlight-error-face ((t (:inherit nano-critical))))
+
+   ;; --- Centaur Tabs Detailed Faces ------------------------
+   '(centaur-tabs-default                 ((t (:inherit nano-default))))
+   '(centaur-tabs-unselected              ((t (:background "#f5f6f7"))))
+   '(centaur-tabs-unselected-modified     ((t (:inherit nano-faded-i))))
+   '(centaur-tabs-selected               ((t (:inherit nano-strong :background "#FFFFFF"))))
+   '(centaur-tabs-selected-modified      ((t (:inherit nano-popout :background "#FFFFFF"))))
+   '(centaur-tabs-close-unselected        ((t (:inherit centaur-tabs-unselected))))
+   '(centaur-tabs-close-selected          ((t (:inherit centaur-tabs-selected))))
+   '(centaur-tabs-name-mouse-face         ((t (:inherit nano-salient))))
+   '(centaur-tabs-close-mouse-face        ((t (:inherit centaur-tabs-selected))))
+   '(centaur-tabs-modified-marker-selected ((t (:inherit centaur-tabs-selected))))
+   '(centaur-tabs-modified-marker-unselected ((t (:inherit centaur-tabs-unselected))))
+   '(centaur-tabs-active-bar-face ((t (:background "purple"))))
+   '(centaur-tabs-jump-identifier-selected ((t (:inherit centaur-tabs-selected :weight extra-bold))))
+   '(centaur-tabs-jump-identifier-unselected ((t (:inherit centaur-tabs-unselected :weight extra-bold))))
+   '(centaur-tabs-dim-buffer-face         ((t (:inherit nano-faded :foreground "gray40"))))
 
    ;; -- mood-line face
    '(mood-line-major-mode  ((t (:inherit nano-subtle-i))))
@@ -1061,6 +1085,10 @@ background color that is barely perceptible."
    '(nano-agenda-selected-today       ((t (:inherit (nano-popout-i nano-strong)))))
    '(nano-agenda-today                ((t (:inherit (nano-popout nano-strong)))))
    '(nano-agenda-weekend              ((t (:inherit (nano-faded)))))
+
+  ;; Treemacs window background (light variant specific background)
+  `(treemacs-window-background-face ((,light (:background "#f5f6f7"))
+                          (,dark  (:background ,nano-dark-background))))
 
    ;; --- EPA ----------------------------------------------------------
    '(epa-field-body                 ((t (:inherit nano-default))))
@@ -1451,7 +1479,7 @@ background color that is barely perceptible."
     '(elpher-gemini-heading1                 ((t (:inherit nano-strong))))
     '(elpher-gemini-heading2                 ((t (:inherit nano-strong))))
     '(elpher-gemini-heading3                 ((t (:inherit nano-strong))))
- 
+
     ;; ---SHR ---------------------------------------------------------
     '(shr-abbreviation                    ((t (:inherit nano-popout))))
     '(shr-text                            ((t (:inherit nano-default))))
