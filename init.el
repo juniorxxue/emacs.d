@@ -325,6 +325,7 @@ This variable does not persist across Emacs sessions.")
         (minibuffer-with-setup-hook
             (lambda ()
               (activate-input-method projectile-replace--active-input-method))
+          (apply orig-fun args))
       (apply orig-fun args))))
 
 (with-eval-after-load 'treemacs
